@@ -63,7 +63,7 @@ export default function PlansPanel({ lang, userId }: { lang: 'ar' | 'en'; userId
     <div className="payment-note"><Wallet/><span><b>{ar ? 'حساب نقطة حاسب كريمي:' : 'Kareemi point account:'} 1299834<br/>{ar ? 'أرقام المحافظ:' : 'Wallet numbers:'} +967730528609 · +967782602676</b></span></div>
     {loading ? <div className="panel">{ar ? 'جارٍ تحميل بيانات الخطط…' : 'Loading live plans…'}</div> : plans.length ? <div className="plans-grid">{plans.map((plan) => <article className={`plan-card ${selected === plan.id ? 'selected' : ''}`} key={plan.id}>
       <div className="plan-top"><Crown size={20}/><span>{plan.duration_days} {ar ? 'يوم' : 'days'}</span></div>
-      <h3>{plan.name}</h3><strong className="plan-price">{plan.price}</strong><small>{ar ? 'السعر' : 'Price'}</small>
+      <h3>{plan.name}</h3><strong className="plan-price">{plan.price} USD</strong><small>{ar ? 'السعر' : 'Price'}</small>
       <p><Coins size={16}/> {plan.credits} {ar ? 'نقطة' : 'credits'}</p>
       <button className="primary wide" onClick={() => setSelected(plan.id)}>{ar ? 'اختيار الخطة' : 'Select plan'}</button>
     </article>)}</div> : <div className="panel"><div className="empty">{ar ? 'لا توجد خطط منشورة حاليًا.' : 'No published plans are available yet.'}</div></div>}
@@ -75,6 +75,6 @@ export default function PlansPanel({ lang, userId }: { lang: 'ar' | 'en'; userId
       <button className="primary" disabled={busy || !receipt}>{busy ? (ar ? 'جارٍ الإرسال…' : 'Submitting…') : (ar ? 'إرسال للمراجعة' : 'Submit for review')}</button>
     </form>}
     {message && <div className="panel form-message" role="status">{message}</div>}
-    <div className="panel payment-history"><h3>{ar ? 'طلبات الدفع السابقة' : 'Payment history'}</h3>{payments.length ? payments.map((payment) => <div className="project-row" key={payment.id}><Clock3 size={18}/><div className="project-info"><b>{payment.amount} · {payment.payment_method}</b><small>{new Date(payment.created_at).toLocaleString(ar ? 'ar' : 'en')}{payment.review_note ? ` · ${payment.review_note}` : ''}</small></div><span className={`status-chip ${payment.status}`}>{statusText(payment.status)}</span></div>) : <div className="empty">{ar ? 'لا توجد طلبات سابقة.' : 'No payment requests yet.'}</div>}</div>
+    <div className="panel payment-history"><h3>{ar ? 'طلبات الدفع السابقة' : 'Payment history'}</h3>{payments.length ? payments.map((payment) => <div className="project-row" key={payment.id}><Clock3 size={18}/><div className="project-info"><b>{payment.amount} USD · {payment.payment_method}</b><small>{new Date(payment.created_at).toLocaleString(ar ? 'ar' : 'en')}{payment.review_note ? ` · ${payment.review_note}` : ''}</small></div><span className={`status-chip ${payment.status}`}>{statusText(payment.status)}</span></div>) : <div className="empty">{ar ? 'لا توجد طلبات سابقة.' : 'No payment requests yet.'}</div>}</div>
   </div>;
 }
