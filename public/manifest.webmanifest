@@ -1,0 +1,13 @@
+{
+  "name": "JAMIL AI",
+  "short_name": "JAMIL AI",
+  "description": "مستقبل الإبداع بين يديك — Your AI Future in Your Hands",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090817",
+  "theme_color": "#100d2b",
+  "icons": [{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

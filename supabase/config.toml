@@ -1,0 +1,4 @@
+project_id = "jamil-ai"
+
+[functions.ai-generate]
+verify_jwt = true
