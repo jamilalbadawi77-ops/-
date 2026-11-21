@@ -126,31 +126,50 @@ alter table public.admin_logs enable row level security; alter table public.serv
 alter table public.voice_clones enable row level security; alter table public.chat_history enable row level security;
 alter table public.app_settings enable row level security;
 
-do $$ declare t text; begin
+do $$ declare t text; owner_column text; begin
  foreach t in array array['profiles','wallets','credit_transactions','subscriptions','payment_requests','projects','generations','notifications','voice_clones','chat_history'] loop
+  owner_column := case when t='profiles' then 'id' else 'user_id' end;
   execute format('drop policy if exists owner_select on public.%I',t);
-  execute format('create policy owner_select on public.%I for select to authenticated using (user_id=auth.uid() or public.is_admin())',t);
+  execute format('create policy owner_select on public.%I for select to authenticated using (%I=auth.uid() or public.is_admin())',t,owner_column);
  end loop;
 end $$;
+drop policy if exists profile_update_own on public.profiles;
 create policy profile_update_own on public.profiles for update to authenticated using(id=auth.uid() or public.is_admin()) with check(id=auth.uid() or public.is_admin());
+drop policy if exists role_read_own on public.user_roles;
 create policy role_read_own on public.user_roles for select to authenticated using(user_id=auth.uid() or public.is_admin());
+drop policy if exists plans_read_active on public.plans;
 create policy plans_read_active on public.plans for select to anon,authenticated using(is_active or public.is_admin());
+drop policy if exists plans_admin_all on public.plans;
 create policy plans_admin_all on public.plans for all to authenticated using(public.is_admin()) with check(public.is_admin());
+drop policy if exists service_read_enabled on public.service_settings;
 create policy service_read_enabled on public.service_settings for select to authenticated using(enabled or public.is_admin());
+drop policy if exists service_admin_all on public.service_settings;
 create policy service_admin_all on public.service_settings for all to authenticated using(public.is_admin()) with check(public.is_admin());
+drop policy if exists admin_logs_read on public.admin_logs;
 create policy admin_logs_read on public.admin_logs for select to authenticated using(public.is_admin());
+drop policy if exists app_settings_read on public.app_settings;
 create policy app_settings_read on public.app_settings for select to authenticated using(true);
+drop policy if exists app_settings_admin on public.app_settings;
 create policy app_settings_admin on public.app_settings for all to authenticated using(public.is_admin()) with check(public.is_admin());
+drop policy if exists own_insert_projects on public.projects;
 create policy own_insert_projects on public.projects for insert to authenticated with check(user_id=auth.uid());
+drop policy if exists own_insert_payments on public.payment_requests;
 create policy own_insert_payments on public.payment_requests for insert to authenticated with check(user_id=auth.uid() and status='pending');
+drop policy if exists own_update_notifications on public.notifications;
 create policy own_update_notifications on public.notifications for update to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
+drop policy if exists own_insert_chat on public.chat_history;
 create policy own_insert_chat on public.chat_history for insert to authenticated with check(user_id=auth.uid());
+drop policy if exists own_update_chat on public.chat_history;
 create policy own_update_chat on public.chat_history for update to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
+drop policy if exists own_delete_projects on public.projects;
 create policy own_delete_projects on public.projects for delete to authenticated using(user_id=auth.uid());
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values
  ('user-files','user-files',false,52428800,array['image/png','image/jpeg','image/webp','audio/mpeg','audio/wav','audio/mp4','video/mp4','application/pdf'])
 on conflict(id) do nothing;
+drop policy if exists user_files_read on storage.objects;
 create policy user_files_read on storage.objects for select to authenticated using(bucket_id='user-files' and (storage.foldername(name))[1]=auth.uid()::text);
+drop policy if exists user_files_write on storage.objects;
 create policy user_files_write on storage.objects for insert to authenticated with check(bucket_id='user-files' and (storage.foldername(name))[1]=auth.uid()::text);
+drop policy if exists user_files_delete on storage.objects;
 create policy user_files_delete on storage.objects for delete to authenticated using(bucket_id='user-files' and (storage.foldername(name))[1]=auth.uid()::text);
