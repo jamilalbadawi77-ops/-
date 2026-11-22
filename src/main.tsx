@@ -15,8 +15,9 @@ function Root() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
     return () => subscription.unsubscribe();
   }, []);
-  if (!ready) return <div style={{ minHeight: '100vh', background: '#090817' }} />;
-  return session ? <App /> : <AuthGate />;
+  if (!ready) return <div style={{ minHeight:'100vh', background:'#090817' }} />;
+  const recovery = new URLSearchParams(window.location.search).has('reset-password');
+  return session && !recovery ? <App /> : <AuthGate />;
 }
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><Root /></React.StrictMode>);
